@@ -2,8 +2,10 @@ package api.anhtrangapiv2.service.parent_category;
 
 import java.util.List;
 
-import api.anhtrangapiv2.dto.ParentCategoryDTO;
+import api.anhtrangapiv2.dtos.ParentCategoryDTO;
 import api.anhtrangapiv2.models.ParentCategory;
+
+
 
 public interface IParentCategoryService {
     List<ParentCategory> getAllParentCategory();

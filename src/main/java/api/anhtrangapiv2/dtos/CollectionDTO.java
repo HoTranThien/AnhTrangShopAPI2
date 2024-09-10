@@ -1,10 +1,11 @@
-package api.anhtrangapiv2.dto;
+package api.anhtrangapiv2.dtos;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class SizeDTO {
+public class CollectionDTO {
     @NotEmpty(message="Name cannot be empty")
     private String name;
+    private String img;
 }

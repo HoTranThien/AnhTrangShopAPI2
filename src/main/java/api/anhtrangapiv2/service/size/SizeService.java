@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import api.anhtrangapiv2.dto.SizeDTO;
+import api.anhtrangapiv2.dtos.SizeDTO;
 import api.anhtrangapiv2.models.Size;
 
 import api.anhtrangapiv2.repositories.ProductSizeRepository;
@@ -20,6 +21,7 @@ public class SizeService implements ISizeService {
     @Autowired
     private final ProductSizeRepository productSizeRepository;
     @Override
+    @Transactional
     public Size createSize(SizeDTO size) {
         if(sizeRepository.existsByName(size.getName())){
             throw new RuntimeException("The size's name already exists");
@@ -30,6 +32,7 @@ public class SizeService implements ISizeService {
         }
     }
     @Override
+    @Transactional
     public Size deleteSize(int id) throws Exception {
         Size existingSize = getSizeById(id);
         if(productSizeRepository.existsBySizeId(id)){
@@ -51,6 +54,7 @@ public class SizeService implements ISizeService {
                 .orElseThrow(() -> new RuntimeException("Size not found with id: " + id));
     }
     @Override
+    @Transactional
     public Size updateSize(int id, SizeDTO size) {
         Size existingSize = getSizeById(id);
         if(sizeRepository.existsByName(size.getName()) && !(existingSize.getName()).equals(size.getName())){

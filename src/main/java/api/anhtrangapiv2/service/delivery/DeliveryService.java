@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import api.anhtrangapiv2.dto.DeliveryDTO;
+import api.anhtrangapiv2.dtos.DeliveryDTO;
 import api.anhtrangapiv2.models.Delivery;
 import api.anhtrangapiv2.repositories.DeliveryRepository;
 import api.anhtrangapiv2.repositories.OrderRepository;
@@ -19,6 +20,7 @@ public class DeliveryService implements IDeliveryService{
     @Autowired
     private final OrderRepository orderRepository;
     @Override
+    @Transactional
     public Delivery createDelivery(DeliveryDTO d) {
         if(deliveryRepository.existsByName(d.getName())){
             throw new RuntimeException("The delivery's name already exists");
@@ -34,6 +36,7 @@ public class DeliveryService implements IDeliveryService{
     }
 
     @Override
+    @Transactional
     public Delivery deletDelivery(int id) {
         Delivery existingDelivery = getDeliveryById(id);
         if(orderRepository.existsByDeliveryId(id)){
@@ -58,6 +61,7 @@ public class DeliveryService implements IDeliveryService{
     }
 
     @Override
+    @Transactional
     public Delivery updateDelivery(int id, DeliveryDTO d) {
         Delivery existingdDelivery = getDeliveryById(id);
         if(deliveryRepository.existsByName(d.getName())&&(!existingdDelivery.getName().equals(d.getName()))){

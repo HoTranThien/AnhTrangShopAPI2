@@ -2,6 +2,7 @@ package api.anhtrangapiv2.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -27,15 +28,15 @@ public class Product extends BaseEntity{
     @Column(
         nullable=false
     )
-    private String name = "Unknow";
+    private String name;
     private long cost;
-    private long sale_cost = 0;
+    private long sale_cost;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
     private int quantity;
-    private boolean isnew = true;
+    private boolean isnew;
 
     @ManyToOne
     @JoinColumn(name="collection_id")
@@ -53,11 +54,14 @@ public class Product extends BaseEntity{
     private ChildrenCategory childrenCategory;
 
     @OneToMany(mappedBy="product",cascade= CascadeType.ALL)
+    @JsonIgnore
     private List<ProductSize> productSize;
 
     @OneToMany(mappedBy="product",cascade= CascadeType.ALL)
+    @JsonIgnore
     private List<ProductColor> productColor;
 
     @OneToMany(mappedBy = "product",cascade= CascadeType.ALL)
+    @JsonIgnore
     List<ProductOrder> productOrder;
 }

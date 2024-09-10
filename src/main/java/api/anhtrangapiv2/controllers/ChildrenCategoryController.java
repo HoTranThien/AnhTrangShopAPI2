@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import api.anhtrangapiv2.dto.ChildrenCategoryDTO;
+import api.anhtrangapiv2.dtos.ChildrenCategoryDTO;
 import api.anhtrangapiv2.responses.ResponseToClient;
 import api.anhtrangapiv2.service.children_category.ChildrenCategoryService;
 import jakarta.validation.Valid;

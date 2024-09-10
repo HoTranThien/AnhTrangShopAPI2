@@ -1,10 +1,10 @@
-package api.anhtrangapiv2.dto;
+package api.anhtrangapiv2.dtos;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class ParentCategoryDTO {
+public class SizeDTO {
     @NotEmpty(message="Name cannot be empty")
     private String name;
 }

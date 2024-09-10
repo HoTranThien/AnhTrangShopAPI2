@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -24,5 +25,16 @@ public class GlobalExceptionHandler {
         .message("error")
         .status(HttpStatus.BAD_REQUEST)
         .data(errors).build());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ResponseToClient> handleMissParameterExceptions(MissingServletRequestPartException ex) {
+        String paramName = ex.getRequestPartName();
+        String message = "Required parameter is missing: " + paramName;
+        return ResponseEntity.badRequest().body(ResponseToClient.builder()
+        .message("error")
+        .status(HttpStatus.BAD_REQUEST)
+        .data(message).build());
     }
 }

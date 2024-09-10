@@ -2,7 +2,7 @@ package api.anhtrangapiv2.service.children_category;
 
 import java.util.List;
 
-import api.anhtrangapiv2.dto.ChildrenCategoryDTO;
+import api.anhtrangapiv2.dtos.ChildrenCategoryDTO;
 import api.anhtrangapiv2.models.ChildrenCategory;
 
 public interface IChildrenCategoryService {

@@ -1,4 +1,4 @@
-package api.anhtrangapiv2.dto;
+package api.anhtrangapiv2.dtos;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;

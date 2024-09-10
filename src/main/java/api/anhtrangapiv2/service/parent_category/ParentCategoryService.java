@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import api.anhtrangapiv2.dto.ParentCategoryDTO;
+import api.anhtrangapiv2.dtos.ParentCategoryDTO;
 import api.anhtrangapiv2.models.ParentCategory;
 import api.anhtrangapiv2.repositories.ParentCategoryRepository;
 import api.anhtrangapiv2.repositories.ProductRepository;
@@ -21,6 +22,7 @@ public class ParentCategoryService implements IParentCategoryService{
     private final ProductRepository productRepository;
     
     @Override
+    @Transactional
     public ParentCategory createParentCategory(ParentCategoryDTO pc) {
         if(parentCategoryRepository.existsByName(pc.getName())){
             throw new RuntimeException("The name already exists");
@@ -33,6 +35,7 @@ public class ParentCategoryService implements IParentCategoryService{
     }
 
     @Override
+    @Transactional
     public ParentCategory deleteParentCategory(int id) {
         ParentCategory deletedpc = getParentCategoryById(id);
         if(productRepository.existsByParentCategoryId(id)){
@@ -55,6 +58,7 @@ public class ParentCategoryService implements IParentCategoryService{
     }
 
     @Override
+    @Transactional
     public ParentCategory updateParentCategory(int id, ParentCategoryDTO pc) {
         ParentCategory updatedpc = getParentCategoryById(id);
         if(parentCategoryRepository.existsByName(pc.getName()) && !(pc.getName()).equals(updatedpc.getName())){

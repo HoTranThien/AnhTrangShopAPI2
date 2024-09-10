@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import api.anhtrangapiv2.dto.ColorDTO;
+import api.anhtrangapiv2.dtos.ColorDTO;
 import api.anhtrangapiv2.models.Color;
 import api.anhtrangapiv2.repositories.ColorRepository;
 import api.anhtrangapiv2.repositories.ProductColorRepository;
@@ -20,6 +21,7 @@ public class ColorService implements IColorService{
     private final ProductColorRepository productColorRepository;
 
     @Override
+    @Transactional
     public Color createColor(ColorDTO color) {
         if(colorRepository.existsByName(color.getName())){
             throw new RuntimeException("The color's name already exists");
@@ -32,6 +34,7 @@ public class ColorService implements IColorService{
     }
 
     @Override
+    @Transactional
     public Color deleteColor(int id) {
         Color existingColor = getColorById(id);
         if(productColorRepository.existsByColorId(id)){
@@ -55,6 +58,7 @@ public class ColorService implements IColorService{
     }
 
     @Override
+    @Transactional
     public Color updateColor(int id, ColorDTO color) {
         Color existingColor = getColorById(id);
         if(colorRepository.existsByName(color.getName())&&!(existingColor.getName()).equals(color.getName()))

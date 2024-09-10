@@ -2,7 +2,7 @@ package api.anhtrangapiv2.service.delivery;
 
 import java.util.List;
 
-import api.anhtrangapiv2.dto.DeliveryDTO;
+import api.anhtrangapiv2.dtos.DeliveryDTO;
 import api.anhtrangapiv2.models.Delivery;
 
 public interface IDeliveryService {

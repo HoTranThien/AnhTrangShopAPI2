@@ -2,6 +2,8 @@ package api.anhtrangapiv2.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,8 +42,10 @@ public class Order extends BaseEntity{
 
     @ManyToOne
     @JoinColumn(name="delivery_id")
+    @JsonIgnore
     private Delivery delivery;
 
     @OneToMany(mappedBy = "order")
+    @JsonIgnore
     List<ProductOrder> product;
 }

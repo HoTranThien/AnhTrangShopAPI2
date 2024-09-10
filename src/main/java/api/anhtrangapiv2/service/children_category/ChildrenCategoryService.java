@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import api.anhtrangapiv2.dto.ChildrenCategoryDTO;
+import api.anhtrangapiv2.dtos.ChildrenCategoryDTO;
 import api.anhtrangapiv2.models.ChildrenCategory;
 import api.anhtrangapiv2.models.ParentCategory;
 
@@ -24,6 +25,7 @@ public class ChildrenCategoryService implements IChildrenCategoryService{
     @Autowired
     private final ProductRepository productRepository;
     @Override
+    @Transactional
     public ChildrenCategory createChildrentCategory(ChildrenCategoryDTO cc) {
         ParentCategory parentCategory = parentCategoryRepository.findById(cc.getPacaId())
         .orElseThrow(()-> new RuntimeException("The parent category doesn't exist"));
@@ -42,6 +44,7 @@ public class ChildrenCategoryService implements IChildrenCategoryService{
     }
 
     @Override
+    @Transactional
     public ChildrenCategory deleteChildrenCategory(int id) {
         ChildrenCategory existingCC = getChildrenCategoryById(id);
         if(productRepository.existsByChildrenCategoryId(id)){
@@ -65,6 +68,7 @@ public class ChildrenCategoryService implements IChildrenCategoryService{
     }
 
     @Override
+    @Transactional
     public ChildrenCategory updateChildrentCategory(int id, ChildrenCategoryDTO cc) {
         ChildrenCategory existingCC = getChildrenCategoryById(id);
         ParentCategory existingPC = parentCategoryRepository.findById(cc.getPacaId())

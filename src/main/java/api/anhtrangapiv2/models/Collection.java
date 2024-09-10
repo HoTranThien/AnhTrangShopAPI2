@@ -2,6 +2,8 @@ package api.anhtrangapiv2.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,8 +27,9 @@ public class Collection extends BaseEntity{
         nullable=false
     )
     private String name;
-    private String img;
+    private String img = "";
     
     @OneToMany(mappedBy="collection",cascade= CascadeType.ALL)
+    @JsonIgnore
     private List<Product> products;
 }
