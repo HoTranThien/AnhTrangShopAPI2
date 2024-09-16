@@ -25,7 +25,7 @@ import lombok.Setter;
 @Entity
 @Table(name="img_product")
 public class ImgProduct extends BaseEntity{
-
+    
     private String link;
 
     @ManyToOne

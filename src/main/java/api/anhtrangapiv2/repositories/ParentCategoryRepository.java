@@ -6,4 +6,5 @@ import api.anhtrangapiv2.models.ParentCategory;
 
 public interface ParentCategoryRepository extends JpaRepository<ParentCategory, Integer>{
     boolean existsByName(String name);
+
 }

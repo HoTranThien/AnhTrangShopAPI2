@@ -21,6 +21,7 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> 
             errors.put(error.getField(), error.getDefaultMessage()));
+        System.out.println("\u001B[31m" + "-----Errors: " + errors + "\u001B[0m");
         return ResponseEntity.badRequest().body(ResponseToClient.builder()
         .message("error")
         .status(HttpStatus.BAD_REQUEST)

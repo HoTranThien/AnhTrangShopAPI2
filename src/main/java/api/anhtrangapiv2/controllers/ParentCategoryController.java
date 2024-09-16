@@ -34,6 +34,15 @@ public class ParentCategoryController {
         .data(parentCategoryService.getAllParentCategory())
         .build());
     }
+
+    // @GetMapping(path = "/get/{id}")
+    // public ResponseEntity<Object> get(@PathVariable int id){
+    //     return ResponseEntity.ok(ResponseToClient.builder()
+    //     .message("OK")
+    //     .status(HttpStatus.OK)
+    //     .data(parentCategoryService.find(id))
+    //     .build());
+    // }
     @PostMapping(path = "/create")
     public ResponseEntity<Object> create(@RequestBody @Valid ParentCategoryDTO pc){
         return ResponseEntity.ok(ResponseToClient.builder()

@@ -28,6 +28,7 @@ import api.anhtrangapiv2.repositories.ProductColorRepository;
 import api.anhtrangapiv2.repositories.ProductRepository;
 import api.anhtrangapiv2.repositories.ProductSizeRepository;
 import api.anhtrangapiv2.repositories.SizeRepository;
+import api.anhtrangapiv2.responses.*;
 import api.anhtrangapiv2.service.S3Storage.S3StorageService;
 import lombok.RequiredArgsConstructor;
 
@@ -56,44 +57,25 @@ public class ProductService implements IProductServie{
     private final OrderRepository orderRepository;
     @Autowired
     private final ImgProductRepository imgProductRepository;
+    @Autowired
+    private final ProductSizeService productSizeService;
 
-    // private String name;
-    
-    // private Long cost;
-
-    // private Long sale_cost;
-
-    // private String description;
-
-    // private int quantity;
-
-    // private boolean isnew;
-
-    // private int collectionId;
-
-    // private int parent_categoryId;
-
-    // private int ChildrenCategoryId;
-
-    // private int sizeId;
-
-    // private int colorId;
     @Override
     @Transactional
     public Product createProduct(ProductDTO pro, MultipartFile[] files) throws Exception {
         Collection existingCollection = collectionRepository.findById(pro.getCollectionId())
         .orElseThrow(()-> new RuntimeException("The collection doesn't exist"));
-        ParentCategory existiParentCategory = parentCategoryRepository.findById(pro.getParentCategoryId())
+        ParentCategory existingParentCategory = parentCategoryRepository.findById(pro.getParentCategoryId())
         .orElseThrow(()-> new RuntimeException("The parent category doesn't exist"));
         ChildrenCategory existingChildrenCategory = childrenCategoryRepository.findById(pro.getChildrenCategoryId())
         .orElseThrow(()-> new RuntimeException("The children category doesn't exist"));
-        if(existingChildrenCategory.getParentCategory()!=existiParentCategory){
+        if(existingChildrenCategory.getParentCategory()!=existingParentCategory){
             throw new RuntimeException("The children category does't belong to the parent category");
         }
 
         Product newProduct = Product.builder()
         .collection(existingCollection)
-        .parentCategory(existiParentCategory)
+        .parentCategory(existingParentCategory)
         .childrenCategory(existingChildrenCategory)
         .name(pro.getName())
         .cost(pro.getCost())
@@ -132,26 +114,239 @@ public class ProductService implements IProductServie{
     @Override
     @Transactional
     public String deleteProduct(int id) {
-        // TODO Auto-generated method stub
-        return null;
+        Product existingProduct = findProductById(id);
+        
+        productRepository.delete(existingProduct);
+        return "Delete success";
+    }
+    
+    @Override
+    public ProductResponse findOneProductById(int id) {
+        Product existingProduct = findProductById(id);
+
+        List<SizeResponse> productSize = existingProduct.getProductSize().stream()
+            .map(ps -> SizeResponse.builder()
+            .id(ps.getSize().getId())
+            .name(ps.getSize().getName())
+            .build()).toList();
+
+        List<ColorResponse> productColor = existingProduct.getProductColor().stream()
+            .map(pc -> ColorResponse.builder()
+            .id(pc.getColor().getId())
+            .name(pc.getColor().getName())
+            .code(pc.getColor().getCode())
+            .build()).toList();
+
+        ParentCategoryResponse parentCategory = ParentCategoryResponse.builder()
+            .id(existingProduct.getParentCategory().getId())
+            .name(existingProduct.getParentCategory().getName()).build();
+
+        ChildrenCategoryResponse childrenCategory = ChildrenCategoryResponse.builder()
+            .id(existingProduct.getChildrenCategory().getId())
+            .name(existingProduct.getChildrenCategory().getName()).build();
+
+        CollectionResponse collection = CollectionResponse.builder()
+            .id(existingProduct.getCollection().getId())
+            .name(existingProduct.getCollection().getName())
+            .build();
+
+        List<ImgProductResponse> imgProduct = existingProduct.getImgProduct().stream()
+            .map(ip -> ImgProductResponse.builder()
+            .id(ip.getId())
+            .link(ip.getLink()).build())
+            .toList();
+        ProductResponse productResponse = ProductResponse.builder()
+        .id(existingProduct.getId())
+        .name(existingProduct.getName())
+        .cost(existingProduct.getCost())
+        .sale_cost(existingProduct.getSale_cost())
+        .description(existingProduct.getDescription())
+        .quantity(existingProduct.getQuantity())
+        .isnew(existingProduct.isIsnew())
+        .productColor(productColor)
+        .productSize(productSize)
+        .collection(collection)
+        .imgProduct(imgProduct)
+        .parentCategory(parentCategory)
+        .childrenCategory(childrenCategory)
+        .build();
+        return productResponse;
     }
 
     @Override
-    public Product getProductById(int id) {
+    public Product findProductById(int id) {
         return productRepository.findById(id).orElseThrow(
             ()-> new RuntimeException("Product not found with id: " + id));
     }
 
+    // public Product findProductById2(int id) {
+    //     return productRepository.findProductById2(id);
+    // }
+    // public Product findProductById3(int id) {
+    //     return productRepository.findProductById3(id);
+    // }
     @Override
-    public List<Product> findAllProducts() {
-        return productRepository.findAll();
+    public List<ProductResponse> findAllProducts() {
+        List<ProductResponse> productResponses = productRepository.findAll().stream()
+        .map(p -> {
+            List<SizeResponse> productSize = p.getProductSize().stream()
+            .map(ps -> SizeResponse.builder()
+            .id(ps.getSize().getId())
+            .name(ps.getSize().getName())
+            .build()).toList();
+
+            List<ColorResponse> productColor = p.getProductColor().stream()
+            .map(pc -> ColorResponse.builder()
+            .id(pc.getColor().getId())
+            .name(pc.getColor().getName())
+            .code(pc.getColor().getCode())
+            .build()).toList();
+
+            ParentCategoryResponse parentCategory = ParentCategoryResponse.builder()
+            .id(p.getParentCategory().getId())
+            .name(p.getParentCategory().getName()).build();
+
+            ChildrenCategoryResponse childrenCategory = ChildrenCategoryResponse.builder()
+            .id(p.getChildrenCategory().getId())
+            .name(p.getChildrenCategory().getName()).build();
+
+            CollectionResponse collection = CollectionResponse.builder()
+            .id(p.getCollection().getId())
+            .name(p.getCollection().getName())
+            .build();
+
+            List<ImgProductResponse> imgProduct = p.getImgProduct().stream()
+            .map(ip -> ImgProductResponse.builder()
+            .id(ip.getId())
+            .link(ip.getLink()).build())
+            .toList();
+
+            return ProductResponse.builder()
+            .id(p.getId())
+            .name(p.getName())
+            .cost(p.getCost())
+            .sale_cost(p.getSale_cost())
+            .description(p.getDescription())
+            .quantity(p.getQuantity())
+            .isnew(p.isIsnew())
+            .collection(collection)
+            .productColor(productColor)
+            .productSize(productSize)
+            .imgProduct(imgProduct)
+            .parentCategory(parentCategory)
+            .childrenCategory(childrenCategory)
+            .build();
+        })
+        .toList();
+        return productResponses;
     }
 
     @Override
     @Transactional
-    public Product updateProduct(int id, ProductDTO pro, MultipartFile[] files) {
-        // TODO Auto-generated method stub
-        return null;
+    public ProductResponse updateProduct(int id, ProductDTO pro, MultipartFile[] files) throws Exception {
+        Product existingProduct = findProductById(id);
+        ParentCategory existingParentCategory = parentCategoryRepository.findById(pro.getParentCategoryId())
+        .orElseThrow(()-> new RuntimeException("Parent category not found"));
+
+        ChildrenCategory existingChildrenCategory = childrenCategoryRepository.findById(pro.getChildrenCategoryId())
+        .orElseThrow(()-> new RuntimeException("Children category not found"));
+
+        if(existingChildrenCategory.getParentCategory()!=existingParentCategory){
+            throw new RuntimeException("The children category does't belong to the parent category");
+        }
+
+        Collection existingCollection = collectionRepository.findById(pro.getCollectionId())
+        .orElseThrow(()-> new RuntimeException("Collection not found"));
+
+        existingProduct.setName(pro.getName());
+        existingProduct.setCost(pro.getCost());
+        existingProduct.setSale_cost(pro.getSale_cost());
+        existingProduct.setDescription(pro.getDescription());
+        existingProduct.setQuantity(pro.getQuantity());
+        existingProduct.setIsnew(pro.isIsnew());
+        existingProduct.setChildrenCategory(existingChildrenCategory);
+        existingProduct.setParentCategory(existingParentCategory);
+        existingProduct.setCollection(existingCollection);
+        
+ 
+        List<ProductSize> existingProductSizes = productSizeRepository.findByProductId(id);
+        List<ProductSize> setProductSize = new ArrayList<>();
+        for(ProductSize ps:existingProductSizes){
+            if(!pro.getSizeIds().contains(ps.getSize().getId())){
+                productSizeRepository.delete(ps);
+            }
+            else{
+                setProductSize.add(ps);
+            }
+        }
+        List<Integer> existingSize = existingProductSizes.stream()
+        .map(ps -> ps.getSize().getId()).toList();
+
+        for(int sizeId:pro.getSizeIds()){
+            if(!existingSize.contains(sizeId)){
+                Size size = sizeRepository.findById(sizeId).orElseThrow(()-> new RuntimeException("Size isn't existent"));
+                ProductSize newProductSize = ProductSize.builder()
+                .product(existingProduct).size(size).build();
+                productSizeRepository.save(newProductSize);
+                setProductSize.add(newProductSize);
+            }
+        }
+        existingProduct.setProductSize(setProductSize);
+
+        List<ProductColor> existingProductColors = productColorRepository.findByProductId(id);
+        List<ProductColor> setProductColor = new ArrayList<>();
+
+        for(ProductColor pc:existingProductColors){
+            if(!pro.getColorIds().contains(pc.getColor().getId())){
+                productColorRepository.delete(pc);
+            }
+            else{
+                setProductColor.add(pc);
+            }
+        }
+        List<Integer> existingColor = existingProductColors.stream()
+        .map(pc -> pc.getColor().getId()).toList();
+
+        for(int colorId:pro.getColorIds()){
+            if(!existingColor.contains(colorId)){
+                Color color = colorRepository.findById(colorId).orElseThrow(()-> new RuntimeException("Color isn't existent"));
+                ProductColor newProductColor = ProductColor.builder()
+                .product(existingProduct).color(color).build();
+                productColorRepository.save(newProductColor);
+                setProductColor.add(newProductColor);
+            }
+        }
+        existingProduct.setProductColor(setProductColor);
+
+        List<ImgProduct> existingImgProduct = imgProductRepository.findByProductId(id);
+        for(Integer imgId:pro.getRemovedImgs()){
+            if(imgId>0){
+                ImgProduct imgProduct = imgProductRepository.findById(imgId).orElseThrow(
+                    () -> new RuntimeException("Can not delete the image"));
+                existingImgProduct.remove(imgProduct);
+                imgProductRepository.delete(imgProduct);
+                s3StorageService.deleteFile(imgProduct.getLink());
+            }
+        }
+        if(files != null){
+            for(MultipartFile file : files){
+                String url;
+                try {
+                    url = s3StorageService.uploadFile(file);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Fail Uploading Image");
+                }
+                ImgProduct newImgProduct = ImgProduct.builder()
+                .product(existingProduct)
+                .link(url)
+                .build();
+                imgProductRepository.save(newImgProduct);
+                existingImgProduct.add(newImgProduct);
+            }
+        }
+        existingProduct.setImgProduct(existingImgProduct);
+        productRepository.save(existingProduct);
+        return findOneProductById(id);
     }
 
 }

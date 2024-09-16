@@ -5,9 +5,10 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import api.anhtrangapiv2.models.ProductSize;
-import api.anhtrangapiv2.models.Size;
 
 public interface ProductSizeRepository extends JpaRepository<ProductSize, Integer>{
-    List<Size> findByProductId(int id);
+    List<ProductSize> findByProductId(int id);
+    ProductSize findByProductIdAndSizeId(int productId, int sizeId);
     boolean existsBySizeId(int id);
+    boolean existsByProductIdAndSizeId(int productId, int sizeId);
 }

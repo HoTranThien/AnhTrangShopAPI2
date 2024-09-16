@@ -10,6 +10,7 @@ import api.anhtrangapiv2.dtos.ColorDTO;
 import api.anhtrangapiv2.models.Color;
 import api.anhtrangapiv2.repositories.ColorRepository;
 import api.anhtrangapiv2.repositories.ProductColorRepository;
+import api.anhtrangapiv2.responses.ColorResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -48,8 +49,14 @@ public class ColorService implements IColorService{
     }
 
     @Override
-    public List<Color> getAllColors() {
-        return colorRepository.findAll();
+    public List<ColorResponse> getAllColors() {
+        List<ColorResponse> colorResponses = colorRepository.findAll().stream()
+        .map(c -> ColorResponse.builder()
+        .id(c.getId())
+        .name(c.getName())
+        .code(c.getCode())
+        .build()).toList();
+        return colorResponses;
     }
 
     @Override

@@ -6,11 +6,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import api.anhtrangapiv2.dtos.ProductDTO;
 import api.anhtrangapiv2.models.Product;
+import api.anhtrangapiv2.responses.ProductResponse;
 
 public interface IProductServie {
-    List<Product> findAllProducts();
-    Product getProductById(int id);
+    List<ProductResponse> findAllProducts();
+    ProductResponse findOneProductById(int id);
+    Product findProductById(int id);
     Product createProduct(ProductDTO pro, MultipartFile[] files) throws Exception;
-    Product updateProduct(int id,ProductDTO pro, MultipartFile[] files);
+    ProductResponse updateProduct(int id,ProductDTO pro, MultipartFile[] files) throws Exception;
     String deleteProduct(int id);
 }

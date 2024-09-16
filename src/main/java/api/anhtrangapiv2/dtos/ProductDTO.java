@@ -2,6 +2,7 @@ package api.anhtrangapiv2.dtos;
 
 import java.util.List;
 
+import api.anhtrangapiv2.responses.ImgProductResponse;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -39,4 +40,6 @@ public class ProductDTO {
     private List<Integer> sizeIds;
 
     private List<Integer>  colorIds;
+
+    private Integer[] removedImgs = new Integer[0];
 }

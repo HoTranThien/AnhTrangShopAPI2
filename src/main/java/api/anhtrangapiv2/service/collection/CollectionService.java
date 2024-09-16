@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import api.anhtrangapiv2.responses.CollectionResponse;
 import api.anhtrangapiv2.dtos.CollectionDTO;
 import api.anhtrangapiv2.models.Collection;
 import api.anhtrangapiv2.repositories.CollectionRepository;
@@ -59,8 +59,14 @@ public class CollectionService implements ICollectionService{
     }
 
     @Override
-    public List<Collection> getAllCollection() {
-        return collectionRepository.findAll();
+    public List<CollectionResponse> getAllCollection() {
+        List<CollectionResponse> collectionResponses = collectionRepository.findAll().stream()
+        .map(c -> CollectionResponse.builder()
+        .id(c.getId())
+        .name(c.getName())
+        .img(c.getImg())
+        .build()).toList();
+        return collectionResponses;
     }
 
     @Override

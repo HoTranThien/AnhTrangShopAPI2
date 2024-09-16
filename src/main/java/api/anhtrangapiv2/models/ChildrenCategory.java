@@ -30,6 +30,7 @@ public class ChildrenCategory extends BaseEntity{
 
     @ManyToOne
     @JoinColumn(name="paca_id")
+    @JsonIgnore
     private ParentCategory parentCategory;
 
     @OneToMany(mappedBy="childrenCategory",cascade= CascadeType.ALL)

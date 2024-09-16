@@ -1,11 +1,11 @@
 package api.anhtrangapiv2.service.children_category;
 
 import java.util.List;
-
+import api.anhtrangapiv2.responses.ChildrenCategoryResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.stream.Collectors;
 import api.anhtrangapiv2.dtos.ChildrenCategoryDTO;
 import api.anhtrangapiv2.models.ChildrenCategory;
 import api.anhtrangapiv2.models.ParentCategory;
@@ -57,8 +57,15 @@ public class ChildrenCategoryService implements IChildrenCategoryService{
     }
 
     @Override
-    public List<ChildrenCategory> getAllChildrenCategory() {
-        return childrentCategoryRepository.findAll();
+    public List<ChildrenCategoryResponse> getAllChildrenCategory() {
+        List<ChildrenCategoryResponse> listChildrenCategoryResponses = childrentCategoryRepository.findAll().stream()
+        .map(cc ->
+        ChildrenCategoryResponse.builder()
+        .name(cc.getName())
+        .id(cc.getId())
+        .pacaId(cc.getParentCategory().getId())
+        .build()).collect(Collectors.toList());
+        return listChildrenCategoryResponses;
     }
 
     @Override

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import api.anhtrangapiv2.dtos.SizeDTO;
 import api.anhtrangapiv2.models.Size;
 import api.anhtrangapiv2.responses.ResponseToClient;
+import api.anhtrangapiv2.responses.SizeResponse;
 import api.anhtrangapiv2.service.size.SizeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class SizeController {
 
     @GetMapping(path="/getall")
     public ResponseEntity<ResponseToClient> getall(){
-        List<Size> sizes = sizeService.getAllSizes();
+        List<SizeResponse> sizes = sizeService.getAllSizes();
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)

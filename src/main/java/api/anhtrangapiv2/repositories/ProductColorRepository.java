@@ -9,4 +9,5 @@ import api.anhtrangapiv2.models.ProductColor;
 public interface ProductColorRepository extends JpaRepository<ProductColor, Integer>{
     List<ProductColor> findByProductId(int id);
     boolean existsByColorId(int id);
+    boolean existsByProductIdAndColorId(int productId, int colorId);
 }

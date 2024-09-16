@@ -4,11 +4,15 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +26,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
+@NamedEntityGraph(
+    name = "myProduct",
+    attributeNodes = @NamedAttributeNode(value = "parentCategory", subgraph = "subgraph.parentCategory")
 
+)
 public class Product extends BaseEntity{
 
     @Column(
@@ -34,7 +42,6 @@ public class Product extends BaseEntity{
 
     @Column(columnDefinition = "TEXT")
     private String description;
-
     private int quantity;
     private boolean isnew;
 
@@ -50,15 +57,15 @@ public class Product extends BaseEntity{
     private ParentCategory parentCategory;
 
     @ManyToOne
-    @JoinColumn(name="children_categorygory_id")
+    @JoinColumn(name="children_category_id")
     private ChildrenCategory childrenCategory;
 
     @OneToMany(mappedBy="product",cascade= CascadeType.ALL)
-    @JsonIgnore
+    //@JsonIgnore
     private List<ProductSize> productSize;
 
     @OneToMany(mappedBy="product",cascade= CascadeType.ALL)
-    @JsonIgnore
+    //@JsonIgnore
     private List<ProductColor> productColor;
 
     @OneToMany(mappedBy = "product",cascade= CascadeType.ALL)

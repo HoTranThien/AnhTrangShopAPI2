@@ -1,6 +1,7 @@
 package api.anhtrangapiv2.service.parent_category;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import api.anhtrangapiv2.dtos.ParentCategoryDTO;
 import api.anhtrangapiv2.models.ParentCategory;
 import api.anhtrangapiv2.repositories.ParentCategoryRepository;
 import api.anhtrangapiv2.repositories.ProductRepository;
+import api.anhtrangapiv2.responses.ChildrenCategoryResponse;
+import api.anhtrangapiv2.responses.ParentCategoryResponse;
 import lombok.RequiredArgsConstructor;
 
 
@@ -48,8 +51,24 @@ public class ParentCategoryService implements IParentCategoryService{
     }
 
     @Override
-    public List<ParentCategory> getAllParentCategory() {
-        return parentCategoryRepository.findAll();
+    public List<ParentCategoryResponse> getAllParentCategory(){
+        List<ParentCategoryResponse> parentCategoryResponses = parentCategoryRepository.findAll().stream()
+        .map(pc -> {
+            List<ChildrenCategoryResponse> childrenCategoryResponses = pc.getChildrenCategories().stream()
+            .map(cc -> ChildrenCategoryResponse.builder()
+            .id(cc.getId())
+            .name(cc.getName())
+            .pacaId(pc.getId())
+            .build()).toList();
+
+            return ParentCategoryResponse.builder()
+            .id(pc.getId())
+            .name(pc.getName())
+            .childrenCategories(childrenCategoryResponses)
+            .build();
+        })
+        .collect(Collectors.toList());
+        return parentCategoryResponses;
     }
 
     @Override

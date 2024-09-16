@@ -11,6 +11,7 @@ import api.anhtrangapiv2.models.Size;
 
 import api.anhtrangapiv2.repositories.ProductSizeRepository;
 import api.anhtrangapiv2.repositories.SizeRepository;
+import api.anhtrangapiv2.responses.SizeResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -45,8 +46,13 @@ public class SizeService implements ISizeService {
 
     }
     @Override
-    public List<Size> getAllSizes() {
-        return sizeRepository.findAll();
+    public List<SizeResponse> getAllSizes() {
+        List<SizeResponse> sizeResponses = sizeRepository.findAll().stream()
+        .map(s -> SizeResponse.builder()
+        .id(s.getId())
+        .name(s.getName())
+        .build()).toList();
+        return sizeResponses;
     }
     @Override
     public Size getSizeById(int id) {

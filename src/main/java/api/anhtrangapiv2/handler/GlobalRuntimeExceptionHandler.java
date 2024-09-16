@@ -13,6 +13,7 @@ public class GlobalRuntimeExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ResponseToClient> handleRuntimeExceptions(RuntimeException ex) {
+        System.out.println("\u001B[31m" + "-----Errors: " + ex.getMessage() + "\u001B[0m");
         return ResponseEntity.badRequest().body(ResponseToClient.builder()
         .message("error")
         .status(HttpStatus.BAD_REQUEST)

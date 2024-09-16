@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,6 @@ public class ParentCategory extends BaseEntity{
     @JsonIgnore
     private List<Product> products;
 
-    @OneToMany(mappedBy="parentCategory",cascade= CascadeType.ALL)
-    @JsonIgnore
+    @OneToMany(mappedBy="parentCategory",cascade= CascadeType.ALL,fetch = FetchType.LAZY)
     private List<ChildrenCategory> childrenCategories;
 }
