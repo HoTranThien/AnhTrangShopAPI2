@@ -3,29 +3,36 @@ package api.anhtrangapiv2.service.collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import api.anhtrangapiv2.responses.CollectionResponse;
+import api.anhtrangapiv2.responses.ProductListResponse;
+import api.anhtrangapiv2.responses.ProductResponse;
 import api.anhtrangapiv2.dtos.CollectionDTO;
 import api.anhtrangapiv2.models.Collection;
+import api.anhtrangapiv2.models.Product;
 import api.anhtrangapiv2.repositories.CollectionRepository;
 import api.anhtrangapiv2.repositories.ProductRepository;
 import api.anhtrangapiv2.service.S3Storage.S3StorageService;
+import api.anhtrangapiv2.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class CollectionService implements ICollectionService{
 
-    @Autowired
     private final CollectionRepository collectionRepository;
 
-    @Autowired
     private final S3StorageService s3StorageService;
 
-    @Autowired
     private final ProductRepository productRepository;
+
+    private final ProductService productService;
 
     @Override
     @Transactional
@@ -67,6 +74,34 @@ public class CollectionService implements ICollectionService{
         .img(c.getImg())
         .build()).toList();
         return collectionResponses;
+    }
+    
+    @Override
+    public CollectionResponse getOne(int id) {
+        Collection existingCollection = getCollectionById(id);
+        CollectionResponse collectionResponse = CollectionResponse.builder()
+        .id(existingCollection.getId())
+        .name(existingCollection.getName())
+        .img(existingCollection.getImg())
+        .build();
+        return collectionResponse;
+    }
+
+    @Override
+    public ProductListResponse getOneWithProducts(int id,PageRequest pageRequest) throws Exception{
+        if(!productRepository.existsByCollectionId(id)){
+            return ProductListResponse.builder()
+            .products(null)
+            .total(0)
+            .build();
+        }
+
+        Page<Product> productPage = productRepository.findByCollectionId(id, pageRequest);
+        List<ProductResponse> productResponses = productService.convertToProductResponse(productPage.getContent());
+        return ProductListResponse.builder()
+        .products(productResponses)
+        .total(productPage.getTotalElements())
+        .build();
     }
 
     @Override

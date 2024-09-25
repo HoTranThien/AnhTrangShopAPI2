@@ -1,12 +1,16 @@
 package api.anhtrangapiv2.service.product;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.github.javafaker.Faker;
 
 import api.anhtrangapiv2.dtos.ProductDTO;
 import api.anhtrangapiv2.models.ChildrenCategory;
@@ -28,37 +32,42 @@ import api.anhtrangapiv2.repositories.ProductColorRepository;
 import api.anhtrangapiv2.repositories.ProductRepository;
 import api.anhtrangapiv2.repositories.ProductSizeRepository;
 import api.anhtrangapiv2.repositories.SizeRepository;
-import api.anhtrangapiv2.responses.*;
+import api.anhtrangapiv2.responses.ChildrenCategoryResponse;
+import api.anhtrangapiv2.responses.CollectionResponse;
+import api.anhtrangapiv2.responses.ColorResponse;
+import api.anhtrangapiv2.responses.ImgProductResponse;
+import api.anhtrangapiv2.responses.ParentCategoryResponse;
+import api.anhtrangapiv2.responses.ProductListResponse;
+import api.anhtrangapiv2.responses.ProductResponse;
+import api.anhtrangapiv2.responses.SizeResponse;
 import api.anhtrangapiv2.service.S3Storage.S3StorageService;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService implements IProductServie{
-    @Autowired
+
     private final S3StorageService s3StorageService;
-    @Autowired
+
     private final ProductRepository productRepository;
-    @Autowired
+
     private final CollectionRepository collectionRepository;
-    @Autowired
+
     private final ParentCategoryRepository parentCategoryRepository;
-    @Autowired
+
     private final ChildrenCategoryRepository childrenCategoryRepository;
-    @Autowired
+
     private final SizeRepository sizeRepository;
-    @Autowired
+
     private final ColorRepository colorRepository;
-    @Autowired
+
     private final ProductColorRepository productColorRepository;
-    @Autowired
+
     private final ProductSizeRepository productSizeRepository;
-    @Autowired
+
     private final OrderRepository orderRepository;
-    @Autowired
+
     private final ImgProductRepository imgProductRepository;
-    @Autowired
-    private final ProductSizeService productSizeService;
 
     @Override
     @Transactional
@@ -111,6 +120,99 @@ public class ProductService implements IProductServie{
         return newProduct;
     }
 
+    public String fake(){
+        Faker faker = new Faker();
+        for(int i = 0; i < 1000; i++){
+            String name = faker.commerce().productName();
+            if(productRepository.existsByName(name)){
+                continue;
+            }
+            Collection existingCollection = collectionRepository.findById(faker.number().numberBetween(1, 3))
+            .orElseThrow(()-> new RuntimeException("The collection doesn't exist"));
+            ChildrenCategory existingChildrenCategory = childrenCategoryRepository.findById(faker.number().numberBetween(1, 11))
+            .orElseThrow(()-> new RuntimeException("The children category doesn't exist"));
+            ParentCategory existingParentCategory = parentCategoryRepository.findById(existingChildrenCategory.getParentCategory().getId())
+            .orElseThrow(()-> new RuntimeException("The parent category doesn't exist"));
+            long cost = faker.number().numberBetween(50000, 3000000);
+            long sale_cost = faker.random().nextBoolean()?cost - cost*faker.number().numberBetween(8,50)/100:0;
+
+            Product newProduct = Product.builder()
+            .collection(existingCollection)
+            .parentCategory(existingParentCategory)
+            .childrenCategory(existingChildrenCategory)
+            .name(name)
+            .cost(cost)
+            .sale_cost(sale_cost)
+            .description(faker.lorem().sentence())
+            .quantity(faker.number().numberBetween(10, 20000))
+            .isnew(faker.random().nextBoolean())
+            .build();
+            newProduct = productRepository.save(newProduct);
+
+            List<Integer> allSizes = Arrays.asList(new Integer[]{1, 2, 3, 4, 5, 6, 7});
+            List<Integer> allColors = Arrays.asList(new Integer[]{1, 2, 3, 4, 5, 6});
+            List<String> allImgs = Arrays.asList(
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/77+1.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/77+2.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/77+3.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/ao+thun+2.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/ao+thun+3.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/ao+thun.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/b+1.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/b2.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/j1.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/j2.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/j3.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k1.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k2.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k3.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k6.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/m4+1.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/m4+2.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/m4+3.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/n1.jpg",
+                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/n2.jpg"
+            );
+
+            List<Integer> collectedSizes = RandomCollect(allSizes,faker.number().numberBetween(1, allSizes.size()));
+            List<Integer> collectedColors = RandomCollect(allColors,faker.number().numberBetween(1, allSizes.size()));
+            List<String> collectedImgs = RandomCollect(allImgs,3);
+
+
+            for(int sizeid:collectedSizes){
+                Size existingSize = sizeRepository.findById(sizeid)
+                .orElseThrow(()-> new RuntimeException("The size doesn't exist"));
+                productSizeRepository.save(ProductSize.builder()
+                .product(newProduct)
+                .size(existingSize).build());
+            }
+            for(int colorid:collectedColors){
+                Color existingColor = colorRepository.findById(colorid)
+                .orElseThrow(()-> new RuntimeException("The color doesn't exist"));
+                productColorRepository.save(ProductColor.builder()
+                .product(newProduct)
+                .color(existingColor).build());
+            }
+    
+            for(String url : collectedImgs){
+                imgProductRepository.save(ImgProduct.builder()
+                .product(newProduct)
+                .link(url)
+                .build());
+            }
+        }
+        return "Complete!!!";
+    }
+    private <T> List<T> RandomCollect(List<T> arr, int number){
+        Faker faker = new Faker();
+        List<T> result = new ArrayList<>();
+        while(result.size() < number){
+            T item = arr.get(faker.random().nextInt(arr.size()));
+            if(!result.contains(item)) result.add(item);
+        }
+        return result;
+    }
+    
     @Override
     @Transactional
     public String deleteProduct(int id) {
@@ -174,6 +276,36 @@ public class ProductService implements IProductServie{
     }
 
     @Override
+    public ProductListResponse findByQuery(String key,PageRequest pageRequest) {
+        Page<Product> productPage = productRepository.findByQuery(key,pageRequest);
+        List<ProductResponse> productResponses = convertToProductResponse(productPage.getContent());
+        return ProductListResponse.builder()
+        .products(productResponses)
+        .total(productPage.getTotalElements())
+        .build();
+    }
+
+    @Override
+    public ProductListResponse findNewProducts(PageRequest pageRequest) {
+        Page<Product> productPage = productRepository.findByIsnew(pageRequest);
+        List<ProductResponse> productResponses = convertToProductResponse(productPage.getContent());
+        return ProductListResponse.builder()
+        .products(productResponses)
+        .total(productPage.getTotalElements())
+        .build();
+    }
+
+    @Override
+    public ProductListResponse findSaleProducts(PageRequest pageRequest) {
+        Page<Product> productPage = productRepository.findBySale_cost(pageRequest);
+        List<ProductResponse> productResponses = convertToProductResponse(productPage.getContent());
+        return ProductListResponse.builder()
+        .products(productResponses)
+        .total(productPage.getTotalElements())
+        .build();
+    }
+
+    @Override
     public Product findProductById(int id) {
         return productRepository.findById(id).orElseThrow(
             ()-> new RuntimeException("Product not found with id: " + id));
@@ -185,9 +317,8 @@ public class ProductService implements IProductServie{
     // public Product findProductById3(int id) {
     //     return productRepository.findProductById3(id);
     // }
-    @Override
-    public List<ProductResponse> findAllProducts() {
-        List<ProductResponse> productResponses = productRepository.findAll().stream()
+    public List<ProductResponse> convertToProductResponse(List<Product> products){
+        return products.stream()
         .map(p -> {
             List<SizeResponse> productSize = p.getProductSize().stream()
             .map(ps -> SizeResponse.builder()
@@ -238,7 +369,15 @@ public class ProductService implements IProductServie{
             .build();
         })
         .toList();
-        return productResponses;
+    }
+    @Override
+    public ProductListResponse findAllProducts(PageRequest pageRequest) {
+        Page<Product> productPage = productRepository.findAll(pageRequest);
+        List<ProductResponse> productResponses = convertToProductResponse(productPage.getContent());
+        return ProductListResponse.builder()
+        .products(productResponses)
+        .total(productPage.getTotalElements())
+        .build();
     }
 
     @Override

@@ -35,5 +35,6 @@ public class ProductOrder {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
 }

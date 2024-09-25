@@ -21,9 +21,9 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/parentcategory")
+@RequestMapping("${api.prefix}/parentcategory")
 public class ParentCategoryController {
-    @Autowired
+
     private final ParentCategoryService parentCategoryService;
 
     @GetMapping(path = "/getall")

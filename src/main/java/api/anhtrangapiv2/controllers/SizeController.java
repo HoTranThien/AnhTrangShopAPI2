@@ -24,9 +24,9 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path="/api/v1/size")
+@RequestMapping(path="${api.prefix}/size")
 public class SizeController {
-    @Autowired
+
     private final SizeService sizeService;
 
     @GetMapping(path="/getall")

@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ResponseToClient {
-    private String message;
+    private Object message;
     private HttpStatus status;
     private Object data;
 }

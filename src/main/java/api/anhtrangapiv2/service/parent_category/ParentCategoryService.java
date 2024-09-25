@@ -19,9 +19,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ParentCategoryService implements IParentCategoryService{
-    @Autowired
+
     private final ParentCategoryRepository parentCategoryRepository;
-    @Autowired
+
     private final ProductRepository productRepository;
     
     @Override

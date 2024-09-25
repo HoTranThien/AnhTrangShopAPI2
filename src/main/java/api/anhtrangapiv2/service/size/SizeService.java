@@ -3,6 +3,7 @@ package api.anhtrangapiv2.service.size;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +18,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class SizeService implements ISizeService {
-    @Autowired
+
     private final SizeRepository sizeRepository;
-    @Autowired
+
     private final ProductSizeRepository productSizeRepository;
     @Override
     @Transactional
@@ -47,7 +48,7 @@ public class SizeService implements ISizeService {
     }
     @Override
     public List<SizeResponse> getAllSizes() {
-        List<SizeResponse> sizeResponses = sizeRepository.findAll().stream()
+        List<SizeResponse> sizeResponses = sizeRepository.findAll(Sort.by(Sort.Direction.ASC,"id")).stream()
         .map(s -> SizeResponse.builder()
         .id(s.getId())
         .name(s.getName())

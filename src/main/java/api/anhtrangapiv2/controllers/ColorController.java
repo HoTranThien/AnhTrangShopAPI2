@@ -22,9 +22,9 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/color")
+@RequestMapping("${api.prefix}/color")
 public class ColorController {
-    @Autowired
+
     private final ColorService colorService;
     
     @GetMapping(path = "/getall")

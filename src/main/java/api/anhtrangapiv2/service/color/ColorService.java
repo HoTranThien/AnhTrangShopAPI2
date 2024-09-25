@@ -16,9 +16,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ColorService implements IColorService{
-    @Autowired
+
     private final ColorRepository colorRepository;
-    @Autowired
+
     private final ProductColorRepository productColorRepository;
 
     @Override

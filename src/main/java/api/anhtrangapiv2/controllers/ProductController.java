@@ -1,6 +1,8 @@
 package api.anhtrangapiv2.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,27 +19,26 @@ import org.springframework.web.multipart.MultipartFile;
 import api.anhtrangapiv2.dtos.ProductDTO;
 import api.anhtrangapiv2.responses.ResponseToClient;
 import api.anhtrangapiv2.service.product.ProductService;
-import api.anhtrangapiv2.service.product.ProductSizeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path="/api/v1/product")
+@RequestMapping(path="${api.prefix}/product")
 public class ProductController {
 
-    @Autowired
     private final ProductService productService;
 
-    @Autowired
-    private final ProductSizeService productSizeService;
-
     @GetMapping(path = "getall")
-    ResponseEntity<Object> getAll(){
+    ResponseEntity<Object> getAll(
+        @RequestParam(defaultValue = "0", required= false) int page,
+        @RequestParam(defaultValue = "10", required= false) int limit
+    ){
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
-        .data(productService.findAllProducts()).build());
+        .data(productService.findAllProducts(pageRequest)).build());
     }
     
     @GetMapping(path = "getone/{id}")
@@ -47,20 +48,43 @@ public class ProductController {
         .status(HttpStatus.OK)
         .data(productService.findOneProductById(id)).build());
     }
-    // @GetMapping(path = "getone2/{id}")
-    // ResponseEntity<Object> getOne2(@PathVariable int id){
-    //     return ResponseEntity.ok(ResponseToClient.builder()
-    //     .message("OK")
-    //     .status(HttpStatus.OK)
-    //     .data(productService.findProductById2(id)).build());
-    // }
-    // @GetMapping(path = "getone3/{id}")
-    // ResponseEntity<Object> getOne3(@PathVariable int id){
-    //     return ResponseEntity.ok(ResponseToClient.builder()
-    //     .message("OK")
-    //     .status(HttpStatus.OK)
-    //     .data(productService.findProductById3(id)).build());
-    // }
+
+    @GetMapping(path = "new")
+    ResponseEntity<Object> getNewProducts(
+        @RequestParam(defaultValue = "0", required= false) int page,
+        @RequestParam(defaultValue = "10", required= false) int limit
+    ){
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(productService.findNewProducts(pageRequest)).build());
+    }
+
+    @GetMapping(path = "sale")
+    ResponseEntity<Object> getSaleProducts(
+        @RequestParam(defaultValue = "0", required= false) int page,
+        @RequestParam(defaultValue = "10", required= false) int limit
+    ){
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(productService.findSaleProducts(pageRequest)).build());
+    }
+
+    @GetMapping(path = "search/{key}")
+    ResponseEntity<Object> getProductsByQuery(
+        @PathVariable String key,
+        @RequestParam(defaultValue = "0", required= false) int page,
+        @RequestParam(defaultValue = "10", required= false) int limit
+        ){
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(productService.findByQuery(key,pageRequest)).build());
+    }
 
     @PostMapping(path = "create")
     ResponseEntity<Object> create(@ModelAttribute @Valid ProductDTO pro,
@@ -72,7 +96,14 @@ public class ProductController {
         .data(productService.createProduct(pro, files))
         .build());
     }
-
+    @PostMapping(path = "fake")
+    ResponseEntity<Object> createFaker() throws Exception{
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(productService.fake())
+        .build());
+    }
     @PutMapping(path = "/update/{id}")
     ResponseEntity<Object> update(@PathVariable int id,@ModelAttribute @Valid ProductDTO pro,
                             @RequestParam(value = "files",required = false) MultipartFile[] files) throws Exception{

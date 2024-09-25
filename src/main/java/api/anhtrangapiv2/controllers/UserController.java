@@ -3,58 +3,52 @@ package api.anhtrangapiv2.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import api.anhtrangapiv2.dtos.DeliveryDTO;
+import api.anhtrangapiv2.dtos.LoginDTO;
+import api.anhtrangapiv2.dtos.UserDTO;
 import api.anhtrangapiv2.responses.ResponseToClient;
-import api.anhtrangapiv2.service.delivery.DeliveryService;
+import api.anhtrangapiv2.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("${api.prefix}/delivery")
-public class DeliveryController {
+@RequestMapping(path="${api.prefix}/user")
+public class UserController {
 
-    private final DeliveryService deliveryService;
+    private final UserService userService;
 
-    @GetMapping(path = "/getall")
-    ResponseEntity<Object> getall(){
+    @PostMapping(path = "/register")
+    public ResponseEntity<Object> createUser(@RequestBody @Valid UserDTO userDTO) throws Exception{
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
-        .data(deliveryService.getAllDelivery()).build());
-    }
-
-    @PostMapping(path = "/create")
-    ResponseEntity<Object> create(@RequestBody @Valid DeliveryDTO d){
-        return ResponseEntity.ok(ResponseToClient.builder()
-        .message("OK")
-        .status(HttpStatus.OK)
-        .data(deliveryService.createDelivery(d)).build());
-    }
-
-    @PutMapping(path = "/update/{id}")
-    ResponseEntity<Object> update(@PathVariable int id, @RequestBody @Valid DeliveryDTO d){
-        return ResponseEntity.ok(ResponseToClient.builder()
-        .message("OK")
-        .status(HttpStatus.OK)
-        .data(deliveryService.updateDelivery(id, d))
+        .data(userService.createUser(userDTO))
         .build());
     }
 
-    @DeleteMapping(path = "/delete/{id}")
-    ResponseEntity<Object> delete(@PathVariable int id){
+    @PutMapping(path = "/update/{id}")
+    public ResponseEntity<Object> updateUser(@PathVariable int id,@RequestBody @Valid UserDTO userDTO) throws Exception{
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
-        .data(deliveryService.deletDelivery(id)).build());
+        .data(userService.updateUser(id,userDTO))
+        .build());
     }
+    @PostMapping(path = "/login")
+    public ResponseEntity<Object> login(@RequestBody @Valid LoginDTO loginDTO) throws Exception{
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(userService.login(loginDTO))
+        .build()); 
+    }
+
 }

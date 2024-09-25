@@ -2,7 +2,10 @@ package api.anhtrangapiv2.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,14 +28,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/api/v1/collection")
+@RequestMapping("${api.prefix}/collection")
 @RequiredArgsConstructor
 public class CollectionController {
     
-    @Autowired
     private S3StorageService s3StorageService;
 
-    @Autowired final CollectionService collectionService;
+    private final CollectionService collectionService;
 
     
     @GetMapping(path = "/getall")
@@ -43,6 +45,29 @@ public class CollectionController {
         .data(collectionService.getAllCollection())
         .build());
     }
+    @GetMapping(path = "/getonewithproducts/{id}")
+    public ResponseEntity<Object> getOneWithProducts(
+        @PathVariable int id,
+        @RequestParam(defaultValue = "0", required= false) int page,
+        @RequestParam(defaultValue = "10", required= false) int limit
+        ) throws Exception{
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(collectionService.getOneWithProducts(id,pageRequest))
+        .build());
+    }
+
+    @GetMapping(path = "/getone/{id}")
+    public ResponseEntity<Object> getOne(@PathVariable int id) throws Exception{
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(collectionService.getOne(id))
+        .build());
+    }
+
     @PostMapping(path = "/create")
     public ResponseEntity<Object> create(@ModelAttribute("collection") @Valid CollectionDTO collectionDTO,
     @RequestParam("file") @Valid MultipartFile file) throws RuntimeException{

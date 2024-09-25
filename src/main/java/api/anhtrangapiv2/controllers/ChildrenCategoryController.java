@@ -1,6 +1,8 @@
 package api.anhtrangapiv2.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import api.anhtrangapiv2.dtos.ChildrenCategoryDTO;
 import api.anhtrangapiv2.responses.ResponseToClient;
@@ -20,9 +23,9 @@ import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/childrencategory")
+@RequestMapping("${api.prefix}/childrencategory")
 public class ChildrenCategoryController {
-    @Autowired
+
     private final ChildrenCategoryService childrenCategoryService;
 
     @GetMapping(path = "/getall")
@@ -31,6 +34,29 @@ public class ChildrenCategoryController {
         .message("OK")
         .status(HttpStatus.OK)
         .data(childrenCategoryService.getAllChildrenCategory())
+        .build());
+    }
+
+    @GetMapping(path = "/getonewithproducts/{id}")
+    ResponseEntity<Object> getOneWithProducts(
+            @PathVariable int id,
+            @RequestParam(defaultValue = "0", required= false) int page,
+            @RequestParam(defaultValue = "10", required= false) int limit
+        ){
+        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(childrenCategoryService.getOneWithProducts(id,pageRequest))
+        .build());
+    }
+
+    @GetMapping(path = "/getone/{id}")
+    ResponseEntity<Object> getOne(@PathVariable int id){
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(childrenCategoryService.getOne(id))
         .build());
     }
 

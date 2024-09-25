@@ -28,12 +28,12 @@ import lombok.Setter;
 public class Order extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Status status = Status.NEW_ORDER;
-    private String customer_name;
-    private String customer_tel;
-    private String customer_address;
+    private String customerName;
+    private String customerTel;
+    private String customerAddress;
 
     @Column(columnDefinition="TEXT")
-    private String customer_note;
+    private String customerNote;
 
     @Column(columnDefinition="TEXT")
     private String note;
@@ -47,5 +47,5 @@ public class Order extends BaseEntity{
 
     @OneToMany(mappedBy = "order")
     @JsonIgnore
-    List<ProductOrder> product;
+    List<ProductOrder> productOrder;
 }

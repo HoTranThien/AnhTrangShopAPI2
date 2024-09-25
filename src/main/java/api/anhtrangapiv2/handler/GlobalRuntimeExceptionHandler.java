@@ -2,6 +2,7 @@ package api.anhtrangapiv2.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,8 +16,18 @@ public class GlobalRuntimeExceptionHandler {
     public ResponseEntity<ResponseToClient> handleRuntimeExceptions(RuntimeException ex) {
         System.out.println("\u001B[31m" + "-----Errors: " + ex.getMessage() + "\u001B[0m");
         return ResponseEntity.badRequest().body(ResponseToClient.builder()
-        .message("error")
+        .message(ex.getMessage())
         .status(HttpStatus.BAD_REQUEST)
-        .data(ex.getMessage()).build());
+        .data(null).build());
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ResponseToClient> handleAccessDeniedExceptions(AccessDeniedException ex) {
+        System.out.println("\u001B[31m" + "-----Errors: " + ex.getMessage() + "\u001B[0m");
+        return ResponseEntity.badRequest().body(ResponseToClient.builder()
+        .message(ex.getMessage())
+        .status(HttpStatus.FORBIDDEN)
+        .data(null).build());
     }
 }

@@ -1,29 +1,39 @@
 package api.anhtrangapiv2.service.children_category;
 
 import java.util.List;
-import api.anhtrangapiv2.responses.ChildrenCategoryResponse;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 import api.anhtrangapiv2.dtos.ChildrenCategoryDTO;
 import api.anhtrangapiv2.models.ChildrenCategory;
 import api.anhtrangapiv2.models.ParentCategory;
-
+import api.anhtrangapiv2.models.Product;
 import api.anhtrangapiv2.repositories.ChildrenCategoryRepository;
 import api.anhtrangapiv2.repositories.ParentCategoryRepository;
 import api.anhtrangapiv2.repositories.ProductRepository;
+import api.anhtrangapiv2.responses.ChildrenCategoryResponse;
+import api.anhtrangapiv2.responses.ProductListResponse;
+import api.anhtrangapiv2.responses.ProductResponse;
+import api.anhtrangapiv2.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ChildrenCategoryService implements IChildrenCategoryService{
-    @Autowired
+
     private final ChildrenCategoryRepository childrentCategoryRepository;
-    @Autowired
+
     private final ParentCategoryRepository parentCategoryRepository;
-    @Autowired
+
     private final ProductRepository productRepository;
+
+    private final ProductService productService;
     @Override
     @Transactional
     public ChildrenCategory createChildrentCategory(ChildrenCategoryDTO cc) {
@@ -41,6 +51,32 @@ public class ChildrenCategoryService implements IChildrenCategoryService{
             return newchild;
         }
         
+    }
+    
+    @Override
+    public ChildrenCategoryResponse getOne(int id) {
+        if(!childrentCategoryRepository.existsById(id)) return null;
+        ChildrenCategory existingChildrenCategory = childrentCategoryRepository.findById(id)
+        .orElseThrow();
+        return ChildrenCategoryResponse.builder()
+        .id(id)
+        .name(existingChildrenCategory.getName())
+        .pacaId(existingChildrenCategory.getParentCategory().getId()).build();
+    }
+
+    @Override
+    public ProductListResponse getOneWithProducts(int id,PageRequest pageRequest) {
+        if(!productRepository.existsByChildrenCategoryId(id))
+        return ProductListResponse.builder()
+        .products(null)
+        .total(0)
+        .build();
+        Page<Product> productPage = productRepository.findByChildrenCategoryId(id,pageRequest);
+        List<ProductResponse> productResponses = productService.convertToProductResponse(productPage.getContent());
+        return ProductListResponse.builder()
+        .products(productResponses)
+        .total(productPage.getTotalElements())
+        .build();
     }
 
     @Override
