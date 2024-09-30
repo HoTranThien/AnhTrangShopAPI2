@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import api.anhtrangapiv2.dtos.ProductDTO;
+import api.anhtrangapiv2.responses.ProductListResponse;
 import api.anhtrangapiv2.responses.ResponseToClient;
 import api.anhtrangapiv2.service.product.ProductService;
+import api.anhtrangapiv2.service.redis.RedisService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -28,17 +30,25 @@ import lombok.RequiredArgsConstructor;
 public class ProductController {
 
     private final ProductService productService;
+    private final RedisService redisService;
 
     @GetMapping(path = "getall")
     ResponseEntity<Object> getAll(
         @RequestParam(defaultValue = "0", required= false) int page,
         @RequestParam(defaultValue = "10", required= false) int limit
-    ){
+    ) throws Exception{
         PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+
+        String key = redisService.getKey("All_Products", pageRequest);
+        ProductListResponse productListResponse = redisService.findAllProducts(key);
+        if(productListResponse == null){
+            productListResponse = productService.findAllProducts(pageRequest);
+            redisService.saveAllProducts(key, productListResponse);
+        }
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
-        .data(productService.findAllProducts(pageRequest)).build());
+        .data(productListResponse).build());
     }
     
     @GetMapping(path = "getone/{id}")
@@ -53,24 +63,37 @@ public class ProductController {
     ResponseEntity<Object> getNewProducts(
         @RequestParam(defaultValue = "0", required= false) int page,
         @RequestParam(defaultValue = "10", required= false) int limit
-    ){
+    ) throws Exception{
         PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+        String key = redisService.getKey("New", pageRequest);
+        ProductListResponse productListResponse = redisService.findAllProducts(key);
+        if(productListResponse == null){
+            productListResponse = productService.findNewProducts(pageRequest);
+            redisService.saveAllProducts(key, productListResponse);
+        }
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
-        .data(productService.findNewProducts(pageRequest)).build());
+        .data(productListResponse).build());
     }
 
     @GetMapping(path = "sale")
     ResponseEntity<Object> getSaleProducts(
         @RequestParam(defaultValue = "0", required= false) int page,
         @RequestParam(defaultValue = "10", required= false) int limit
-    ){
+    ) throws Exception{
         PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+        String key = redisService.getKey("Sale", pageRequest);
+
+        ProductListResponse productListResponse = redisService.findAllProducts(key);
+        if(productListResponse == null){
+            productListResponse = productService.findSaleProducts(pageRequest);
+            redisService.saveAllProducts(key, productListResponse);
+        }
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
-        .data(productService.findSaleProducts(pageRequest)).build());
+        .data(productListResponse).build());
     }
 
     @GetMapping(path = "search/{key}")
@@ -89,7 +112,7 @@ public class ProductController {
     @PostMapping(path = "create")
     ResponseEntity<Object> create(@ModelAttribute @Valid ProductDTO pro,
                 @RequestParam("files") MultipartFile[] files) throws Exception{
-                            
+        redisService.clear();             
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
@@ -107,7 +130,7 @@ public class ProductController {
     @PutMapping(path = "/update/{id}")
     ResponseEntity<Object> update(@PathVariable int id,@ModelAttribute @Valid ProductDTO pro,
                             @RequestParam(value = "files",required = false) MultipartFile[] files) throws Exception{
-        System.out.println("\u001B[32m" + "++++++++" + pro + "\u001B[0m");
+        redisService.clear(); 
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
@@ -117,6 +140,7 @@ public class ProductController {
 
     @DeleteMapping(path = "/delete/{id}")
     ResponseEntity<Object> delete(@PathVariable int id){
+        redisService.clear(); 
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)

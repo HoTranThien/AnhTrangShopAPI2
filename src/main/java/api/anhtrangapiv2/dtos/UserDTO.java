@@ -13,9 +13,15 @@ public class UserDTO {
     @NotNull(message= "Password cannot be null")
     private String password;
 
-    @NotBlank(message="Password cannot be blank")
-    @NotNull(message= "Password cannot be null")
+    @NotBlank(message="Email cannot be blank")
+    @NotNull(message= "Email cannot be null")
+    private String email;
+
+    @NotBlank(message="Name cannot be blank")
+    @NotNull(message= "Name cannot be null")
     private String fullname;
+
+    private String address;
 
     private int roleId = 1;
 }

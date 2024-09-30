@@ -16,6 +16,8 @@ import api.anhtrangapiv2.dtos.UserDTO;
 import api.anhtrangapiv2.responses.ResponseToClient;
 import api.anhtrangapiv2.service.user.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,6 +26,31 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
+
+    @PostMapping(path = "/getorders")
+    public ResponseEntity<Object> getOrders(@RequestBody @NotBlank @NotNull String token){
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(userService.getOrders(token))
+        .build());
+    }
+    @PostMapping(path = "/getusername")
+    public ResponseEntity<Object> getUserName(@RequestBody @NotBlank @NotNull String token){
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(userService.getFullName(token))
+        .build());
+    }
+    @PostMapping(path = "/getuserdetail")
+    public ResponseEntity<Object> getUserDetail(@RequestBody @NotBlank @NotNull String token){
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(userService.getUserDetail(token))
+        .build());
+    }
 
     @PostMapping(path = "/register")
     public ResponseEntity<Object> createUser(@RequestBody @Valid UserDTO userDTO) throws Exception{
@@ -35,7 +62,7 @@ public class UserController {
     }
 
     @PutMapping(path = "/update/{id}")
-    public ResponseEntity<Object> updateUser(@PathVariable int id,@RequestBody @Valid UserDTO userDTO) throws Exception{
+    public ResponseEntity<Object> updateUser(@PathVariable int id,@RequestBody UserDTO userDTO) throws Exception{
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
@@ -51,4 +78,12 @@ public class UserController {
         .build()); 
     }
 
+    @PostMapping(path = "/getrole")
+    public ResponseEntity<Object> getRole(@RequestBody @NotBlank @NotNull String token){
+        return ResponseEntity.ok(ResponseToClient.builder()
+        .message("OK")
+        .status(HttpStatus.OK)
+        .data(userService.getRole(token))
+        .build());
+    }
 }

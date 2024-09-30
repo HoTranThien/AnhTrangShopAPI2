@@ -15,18 +15,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderResponse {
+public class UserOrdersResponse {
     private int id;
     private Status status;
     private String customerName;
     private String customerTel;
     private String customerAddress;
-    private String customerNote;
-    private String note;
     private long total;
-    private Delivery delivery;
+    private String delivery;
     private String code;
     private LocalDateTime createdAt;
-    private String userPhoneNumber;
-    List<ProductOrderResponse> productOrder;
+    private List<ProductOrderResponse> productOrder;
 }

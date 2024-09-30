@@ -34,6 +34,7 @@ public class JwtTokenUtil {
             .setClaims(claims)
             .setSubject(user.getPhoneNumber())
             .setExpiration(new Date(System.currentTimeMillis() + expiration*1000L))
+            //.setExpiration(new Date(System.currentTimeMillis() + 30*1000L))
             .signWith(getSignInKey(),SignatureAlgorithm.HS256) 
             .compact();
             return token;

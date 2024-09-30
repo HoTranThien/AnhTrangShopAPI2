@@ -121,86 +121,88 @@ public class ProductService implements IProductServie{
     }
 
     public String fake(){
-        Faker faker = new Faker();
-        for(int i = 0; i < 1000; i++){
-            String name = faker.commerce().productName();
-            if(productRepository.existsByName(name)){
-                continue;
-            }
-            Collection existingCollection = collectionRepository.findById(faker.number().numberBetween(1, 3))
-            .orElseThrow(()-> new RuntimeException("The collection doesn't exist"));
-            ChildrenCategory existingChildrenCategory = childrenCategoryRepository.findById(faker.number().numberBetween(1, 11))
-            .orElseThrow(()-> new RuntimeException("The children category doesn't exist"));
-            ParentCategory existingParentCategory = parentCategoryRepository.findById(existingChildrenCategory.getParentCategory().getId())
-            .orElseThrow(()-> new RuntimeException("The parent category doesn't exist"));
-            long cost = faker.number().numberBetween(50000, 3000000);
-            long sale_cost = faker.random().nextBoolean()?cost - cost*faker.number().numberBetween(8,50)/100:0;
+        // Faker faker = new Faker();
+        // for(int i = 0; i < 200; i++){
+        //     String name = faker.commerce().productName();
+        //     if(productRepository.existsByName(name)){
+        //         continue;
+        //     }
+        //     // Collection existingCollection = collectionRepository.findById(faker.number().numberBetween(1, 3))
+        //     // .orElseThrow(()-> new RuntimeException("The collection doesn't exist"));
+        //     Collection existingCollection = collectionRepository.findById(3)
+        //     .orElseThrow(()-> new RuntimeException("The collection doesn't exist"));
+        //     ChildrenCategory existingChildrenCategory = childrenCategoryRepository.findById(faker.number().numberBetween(9, 12))
+        //     .orElseThrow(()-> new RuntimeException("The children category doesn't exist"));
+        //     ParentCategory existingParentCategory = parentCategoryRepository.findById(existingChildrenCategory.getParentCategory().getId())
+        //     .orElseThrow(()-> new RuntimeException("The parent category doesn't exist"));
+        //     long cost = faker.number().numberBetween(50000, 3000000);
+        //     long sale_cost = faker.random().nextBoolean()?cost - cost*faker.number().numberBetween(8,50)/100:0;
 
-            Product newProduct = Product.builder()
-            .collection(existingCollection)
-            .parentCategory(existingParentCategory)
-            .childrenCategory(existingChildrenCategory)
-            .name(name)
-            .cost(cost)
-            .sale_cost(sale_cost)
-            .description(faker.lorem().sentence())
-            .quantity(faker.number().numberBetween(10, 20000))
-            .isnew(faker.random().nextBoolean())
-            .build();
-            newProduct = productRepository.save(newProduct);
+        //     Product newProduct = Product.builder()
+        //     .collection(existingCollection)
+        //     .parentCategory(existingParentCategory)
+        //     .childrenCategory(existingChildrenCategory)
+        //     .name(name)
+        //     .cost(cost)
+        //     .sale_cost(sale_cost)
+        //     .description(faker.lorem().sentence())
+        //     .quantity(faker.number().numberBetween(10, 20000))
+        //     .isnew(faker.random().nextBoolean())
+        //     .build();
+        //     newProduct = productRepository.save(newProduct);
 
-            List<Integer> allSizes = Arrays.asList(new Integer[]{1, 2, 3, 4, 5, 6, 7});
-            List<Integer> allColors = Arrays.asList(new Integer[]{1, 2, 3, 4, 5, 6});
-            List<String> allImgs = Arrays.asList(
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/77+1.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/77+2.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/77+3.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/ao+thun+2.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/ao+thun+3.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/ao+thun.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/b+1.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/b2.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/j1.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/j2.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/j3.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k1.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k2.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k3.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k6.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/m4+1.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/m4+2.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/m4+3.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/n1.jpg",
-                "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/n2.jpg"
-            );
+        //     List<Integer> allSizes = Arrays.asList(new Integer[]{1, 2, 3, 4, 5, 6, 7});
+        //     List<Integer> allColors = Arrays.asList(new Integer[]{1, 2, 3, 4, 5, 6});
+        //     List<String> allImgs = Arrays.asList(
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/77+1.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/77+2.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/77+3.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/ao+thun+2.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/ao+thun+3.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/ao+thun.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/b+1.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/b2.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/j1.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/j2.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/j3.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k1.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k2.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k3.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/k6.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/m4+1.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/m4+2.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/m4+3.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/n1.jpg",
+        //         "https://anhtrangbucket.s3.ap-southeast-2.amazonaws.com/n2.jpg"
+        //     );
 
-            List<Integer> collectedSizes = RandomCollect(allSizes,faker.number().numberBetween(1, allSizes.size()));
-            List<Integer> collectedColors = RandomCollect(allColors,faker.number().numberBetween(1, allSizes.size()));
-            List<String> collectedImgs = RandomCollect(allImgs,3);
+        //     List<Integer> collectedSizes = RandomCollect(allSizes,faker.number().numberBetween(1, allSizes.size()));
+        //     List<Integer> collectedColors = RandomCollect(allColors,faker.number().numberBetween(1, allSizes.size()));
+        //     List<String> collectedImgs = RandomCollect(allImgs,3);
 
 
-            for(int sizeid:collectedSizes){
-                Size existingSize = sizeRepository.findById(sizeid)
-                .orElseThrow(()-> new RuntimeException("The size doesn't exist"));
-                productSizeRepository.save(ProductSize.builder()
-                .product(newProduct)
-                .size(existingSize).build());
-            }
-            for(int colorid:collectedColors){
-                Color existingColor = colorRepository.findById(colorid)
-                .orElseThrow(()-> new RuntimeException("The color doesn't exist"));
-                productColorRepository.save(ProductColor.builder()
-                .product(newProduct)
-                .color(existingColor).build());
-            }
+        //     for(int sizeid:collectedSizes){
+        //         Size existingSize = sizeRepository.findById(sizeid)
+        //         .orElseThrow(()-> new RuntimeException("The size doesn't exist"));
+        //         productSizeRepository.save(ProductSize.builder()
+        //         .product(newProduct)
+        //         .size(existingSize).build());
+        //     }
+        //     for(int colorid:collectedColors){
+        //         Color existingColor = colorRepository.findById(colorid)
+        //         .orElseThrow(()-> new RuntimeException("The color doesn't exist"));
+        //         productColorRepository.save(ProductColor.builder()
+        //         .product(newProduct)
+        //         .color(existingColor).build());
+        //     }
     
-            for(String url : collectedImgs){
-                imgProductRepository.save(ImgProduct.builder()
-                .product(newProduct)
-                .link(url)
-                .build());
-            }
-        }
+        //     for(String url : collectedImgs){
+        //         imgProductRepository.save(ImgProduct.builder()
+        //         .product(newProduct)
+        //         .link(url)
+        //         .build());
+        //     }
+        // }
         return "Complete!!!";
     }
     private <T> List<T> RandomCollect(List<T> arr, int number){

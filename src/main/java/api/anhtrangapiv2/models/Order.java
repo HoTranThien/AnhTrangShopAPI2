@@ -40,6 +40,9 @@ public class Order extends BaseEntity{
 
     private long total;
 
+    @Column(length=10)
+    private String code;
+
     @ManyToOne
     @JoinColumn(name="delivery_id")
     @JsonIgnore
@@ -48,4 +51,8 @@ public class Order extends BaseEntity{
     @OneToMany(mappedBy = "order")
     @JsonIgnore
     List<ProductOrder> productOrder;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

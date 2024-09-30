@@ -1,22 +1,15 @@
 package api.anhtrangapiv2.service.order;
 
 import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import api.anhtrangapiv2.dtos.*;
-import api.anhtrangapiv2.models.Delivery;
-import api.anhtrangapiv2.models.ImgProduct;
-import api.anhtrangapiv2.models.Order;
-import api.anhtrangapiv2.models.ProductOrder;
-import api.anhtrangapiv2.models.Status;
-import api.anhtrangapiv2.models.Product;
-import api.anhtrangapiv2.repositories.DeliveryRepository;
-import api.anhtrangapiv2.repositories.OrderRepository;
-import api.anhtrangapiv2.repositories.ProductRepository;
-import api.anhtrangapiv2.repositories.ProductOrderRepository;
+import api.anhtrangapiv2.models.*;
+import api.anhtrangapiv2.repositories.*;
 import api.anhtrangapiv2.responses.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +19,10 @@ import lombok.RequiredArgsConstructor;
 public class OrderService implements IOrderService{
 
     private final OrderRepository orderRepository;
-
     private final DeliveryRepository deliveryRepository;
-
     private final ProductRepository productRepository;
-
     private final ProductOrderRepository productOrderRepository;
-
+    private final UserRepository userRepository;
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -41,18 +31,24 @@ public class OrderService implements IOrderService{
         Delivery existingDelivery = deliveryRepository.findById(order.getDeliveryId()).orElseThrow(
             () -> new RuntimeException("Delivery not found with id: " + order.getDeliveryId())
         );
+        User existingUser = userRepository.findById(order.getUserId()).orElseThrow(
+            () -> new RuntimeException("User not found with id: " + order.getUserId())
+        );
         Order newOrder = Order.builder()
         .status(order.getStatus())
         .customerName(order.getCustomerName())
         .customerTel(order.getCustomerTel())
         .customerAddress(order.getCustomerAddress())
         .customerNote(order.getCustomerNote())
+        .user(existingUser)
         .note(order.getNote())
         .total(order.getTotal())
         .delivery(existingDelivery)
         .build();
         orderRepository.save(newOrder);
-
+        String code = generateCode(newOrder);
+        newOrder.setCode(code);
+        orderRepository.save(newOrder);
         for(ProductOrderDTO po: order.getProductOrder()){
             Product existingProduct = productRepository.findById(po.getProductId()).orElseThrow(
                 () -> new RuntimeException("Product not found with id: " + po.getProductId())
@@ -66,6 +62,17 @@ public class OrderService implements IOrderService{
             productOrderRepository.save(newPO);
         }
         return newOrder;
+    }
+    private String generateCode(Order order){
+        int id = order.getId();
+        Integer year = order.getCreateAt().getYear();
+        int size = orderRepository.findByUserId(order.getUser().getId()).size();
+        Random random = new Random();
+        char randomChar1 = (char) (random.nextInt(26) + 'A');
+        char randomChar2 = (char) (random.nextInt(26) + 'A');
+        String code = year.toString().substring(2)
+        + randomChar1 + randomChar2 + String.format("%04d", size);
+        return code;
     }
 
     @Override
@@ -101,6 +108,7 @@ public class OrderService implements IOrderService{
             return OrderResponse.builder()
             .id(o.getId())
             .status(o.getStatus())
+            .code(o.getCode())
             .customerName(o.getCustomerName())
             .customerTel(o.getCustomerTel())
             .customerAddress(o.getCustomerAddress())
@@ -110,6 +118,7 @@ public class OrderService implements IOrderService{
             .createdAt(o.getCreateAt())
             .delivery(o.getDelivery())
             .productOrder(productOrders)
+            .userPhoneNumber(o.getUser().getPhoneNumber())
             .build();
         })
         .toList();
@@ -143,6 +152,7 @@ public class OrderService implements IOrderService{
         return OrderResponse.builder()
         .id(existingOrder.getId())
         .status(existingOrder.getStatus())
+        .code(existingOrder.getCode())
         .customerName(existingOrder.getCustomerName())
         .customerTel(existingOrder.getCustomerTel())
         .customerAddress(existingOrder.getCustomerAddress())
@@ -152,6 +162,7 @@ public class OrderService implements IOrderService{
         .createdAt(existingOrder.getCreateAt())
         .delivery(existingOrder.getDelivery())
         .productOrder(productOrders)
+        .userPhoneNumber(existingOrder.getUser().getPhoneNumber())
         .build();
     }
 

@@ -4,10 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import api.anhtrangapiv2.models.Delivery;
-import api.anhtrangapiv2.models.ProductOrder;
 import api.anhtrangapiv2.models.Status;
-import api.anhtrangapiv2.responses.ProductResponse;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -44,6 +41,10 @@ public class OrderDTO {
     @Min(value = 1, message = "Delivery Id must be > 0")
     @JsonProperty("delivery_id")
     private int deliveryId;
+
+    @Min(value = 1, message = "User Id must be > 0")
+    @JsonProperty("user_id")
+    private int userId;
 
     List<ProductOrderDTO> productOrder;
 

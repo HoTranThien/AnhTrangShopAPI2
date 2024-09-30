@@ -55,7 +55,6 @@ public class WebSecurityConfig {
         String.format("%s/collection/**", this.prefix),
         String.format("%s/parentcategory/**", this.prefix),
         String.format("%s/childrencategory/**", this.prefix),
-        String.format("%s/order/**", this.prefix)
     };
 }
 
@@ -66,10 +65,20 @@ public class WebSecurityConfig {
             .addFilterBefore(preFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(request -> request
                 .requestMatchers(HttpMethod.GET,whiteList).permitAll()
-                .requestMatchers(String.format("%s/user/**", this.prefix)).permitAll()
+                .requestMatchers(HttpMethod.POST, String.format("%s/user/**", this.prefix)).permitAll()
                 .requestMatchers(onlyForAdminList).hasAnyRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,
+                String.format("%s/order/**", this.prefix)).hasAnyRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE,
+                String.format("%s/order/**", this.prefix)).hasAnyRole("ADMIN")
                 .requestMatchers(HttpMethod.GET,
+                    String.format("%s/order/**", this.prefix)).hasAnyRole("USER","ADMIN")
+                .requestMatchers(HttpMethod.POST,
                     String.format("%s/order/**", this.prefix)).hasAnyRole("USER")
+                .requestMatchers(HttpMethod.GET,
+                    String.format("%s/user/**", this.prefix)).hasAnyRole("USER")
+                .requestMatchers(HttpMethod.PUT,
+                    String.format("%s/user/**", this.prefix)).hasAnyRole("USER")
                 .anyRequest().authenticated()
                 )
             .exceptionHandling((exceptionHandling) -> exceptionHandling
