@@ -17,7 +17,7 @@ import api.anhtrangapiv2.responses.ResponseToClient;
 import api.anhtrangapiv2.service.parent_category.ParentCategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
+import api.anhtrangapiv2.service.redis.RedisService;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class ParentCategoryController {
 
     private final ParentCategoryService parentCategoryService;
+    private final RedisService redisService;
 
     @GetMapping(path = "/getall")
     public ResponseEntity<Object> getall(){
@@ -54,6 +55,7 @@ public class ParentCategoryController {
     }
     @PutMapping(path = "/update/{id}")
     public ResponseEntity<Object> update(@PathVariable int id, @RequestBody @Valid ParentCategoryDTO pc){
+        redisService.clear();
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)

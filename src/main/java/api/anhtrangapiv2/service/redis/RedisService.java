@@ -54,4 +54,10 @@ public class  RedisService implements IRedisService{
         }
 
     }
+
+    // public String test(){
+    //     Jedis jedis = jedisPool.getResource();
+    //     jedis.set("abcd", "12345");
+    //     return "success";
+    // }
 }

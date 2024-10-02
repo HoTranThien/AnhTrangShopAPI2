@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import api.anhtrangapiv2.dtos.ChildrenCategoryDTO;
+import api.anhtrangapiv2.responses.ProductListResponse;
 import api.anhtrangapiv2.responses.ResponseToClient;
 import api.anhtrangapiv2.service.children_category.ChildrenCategoryService;
+import api.anhtrangapiv2.service.redis.RedisService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ChildrenCategoryController {
 
     private final ChildrenCategoryService childrenCategoryService;
+    private final RedisService redisService;
 
     @GetMapping(path = "/getall")
     ResponseEntity<Object> getall(){
@@ -42,12 +45,18 @@ public class ChildrenCategoryController {
             @PathVariable int id,
             @RequestParam(defaultValue = "0", required= false) int page,
             @RequestParam(defaultValue = "10", required= false) int limit
-        ){
+        ) throws Exception{
         PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+        String key = redisService.getKey("ChildrenCategory",id, pageRequest);
+        ProductListResponse productListResponse = redisService.findAllProducts(key);
+        if(productListResponse == null){
+            productListResponse = childrenCategoryService.getOneWithProducts(id,pageRequest);
+            redisService.saveAllProducts(key, productListResponse);
+        }
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
-        .data(childrenCategoryService.getOneWithProducts(id,pageRequest))
+        .data(productListResponse)
         .build());
     }
 
@@ -71,6 +80,7 @@ public class ChildrenCategoryController {
 
     @PutMapping(path = "/update/{id}")
     ResponseEntity<Object> update(@PathVariable int id, @RequestBody @Valid ChildrenCategoryDTO cc){
+        redisService.clear();
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)

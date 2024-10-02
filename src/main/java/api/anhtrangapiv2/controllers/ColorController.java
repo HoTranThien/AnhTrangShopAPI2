@@ -19,6 +19,7 @@ import api.anhtrangapiv2.responses.ResponseToClient;
 import api.anhtrangapiv2.service.color.ColorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import api.anhtrangapiv2.service.redis.RedisService;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,7 +27,8 @@ import lombok.RequiredArgsConstructor;
 public class ColorController {
 
     private final ColorService colorService;
-    
+    private final RedisService redisService;
+
     @GetMapping(path = "/getall")
     public ResponseEntity<Object> getall(){
         return ResponseEntity.ok(ResponseToClient.builder()
@@ -49,6 +51,7 @@ public class ColorController {
     @PutMapping(path = "/update/{id}")
     public ResponseEntity<Object> update(@PathVariable int id, @RequestBody @Valid ColorDTO color){
         Color updatedColor = colorService.updateColor(id, color);
+        redisService.clear();
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)

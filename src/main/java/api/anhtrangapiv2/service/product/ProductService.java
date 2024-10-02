@@ -122,16 +122,16 @@ public class ProductService implements IProductServie{
 
     public String fake(){
         // Faker faker = new Faker();
-        // for(int i = 0; i < 200; i++){
+        // for(int i = 0; i < 1200; i++){
         //     String name = faker.commerce().productName();
         //     if(productRepository.existsByName(name)){
         //         continue;
         //     }
-        //     // Collection existingCollection = collectionRepository.findById(faker.number().numberBetween(1, 3))
-        //     // .orElseThrow(()-> new RuntimeException("The collection doesn't exist"));
-        //     Collection existingCollection = collectionRepository.findById(3)
+        //     Collection existingCollection = collectionRepository.findById(faker.number().numberBetween(1, 4))
         //     .orElseThrow(()-> new RuntimeException("The collection doesn't exist"));
-        //     ChildrenCategory existingChildrenCategory = childrenCategoryRepository.findById(faker.number().numberBetween(9, 12))
+        //     // Collection existingCollection = collectionRepository.findById(3)
+        //     // .orElseThrow(()-> new RuntimeException("The collection doesn't exist"));
+        //     ChildrenCategory existingChildrenCategory = childrenCategoryRepository.findById(faker.number().numberBetween(1, 12))
         //     .orElseThrow(()-> new RuntimeException("The children category doesn't exist"));
         //     ParentCategory existingParentCategory = parentCategoryRepository.findById(existingChildrenCategory.getParentCategory().getId())
         //     .orElseThrow(()-> new RuntimeException("The parent category doesn't exist"));

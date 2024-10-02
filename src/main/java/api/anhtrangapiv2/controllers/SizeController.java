@@ -21,6 +21,7 @@ import api.anhtrangapiv2.responses.SizeResponse;
 import api.anhtrangapiv2.service.size.SizeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import api.anhtrangapiv2.service.redis.RedisService;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class SizeController {
 
     private final SizeService sizeService;
+    private final RedisService redisService;
 
     @GetMapping(path="/getall")
     public ResponseEntity<ResponseToClient> getall(){
@@ -52,6 +54,7 @@ public class SizeController {
     public ResponseEntity<ResponseToClient> update(@PathVariable int id,
     @Valid @RequestBody SizeDTO size){
         Size newsize = sizeService.updateSize(id, size);
+        redisService.clear();
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)

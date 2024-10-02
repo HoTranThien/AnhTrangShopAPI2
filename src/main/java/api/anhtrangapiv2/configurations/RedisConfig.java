@@ -15,6 +15,9 @@ public class RedisConfig {
     @Value("${redis.port}")
     private int redisPort;
 
+    @Value("${redis.url}")
+    private String redisUrl;
+
     @Bean
     public JedisPool jedisPool() {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
@@ -25,7 +28,10 @@ public class RedisConfig {
         poolConfig.setTestOnReturn(true);
         poolConfig.setTestWhileIdle(true);
         poolConfig.setBlockWhenExhausted(true);
-        return new JedisPool(poolConfig, redisHost, redisPort, 10000);
+        // JedisPool pool = new JedisPool(poolConfig, redisHost, redisPort, 3000);
+
+        JedisPool pool = new JedisPool(poolConfig,redisUrl); // redis in render
+        return pool;
     }
 
 }

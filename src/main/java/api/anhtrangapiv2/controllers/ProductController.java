@@ -59,6 +59,14 @@ public class ProductController {
         .data(productService.findOneProductById(id)).build());
     }
 
+    // @GetMapping(path = "testredis")
+    // ResponseEntity<Object> test(){
+    //     return ResponseEntity.ok(ResponseToClient.builder()
+    //     .message("OK")
+    //     .status(HttpStatus.OK)
+    //     .data(redisService.test()).build());
+    // }
+
     @GetMapping(path = "new")
     ResponseEntity<Object> getNewProducts(
         @RequestParam(defaultValue = "0", required= false) int page,

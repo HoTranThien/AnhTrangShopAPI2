@@ -21,11 +21,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import api.anhtrangapiv2.dtos.CollectionDTO;
 import api.anhtrangapiv2.models.Collection;
+import api.anhtrangapiv2.responses.ProductListResponse;
 import api.anhtrangapiv2.responses.ResponseToClient;
 import api.anhtrangapiv2.service.S3Storage.S3StorageService;
 import api.anhtrangapiv2.service.collection.CollectionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import api.anhtrangapiv2.service.redis.RedisService;
 
 @Controller
 @RequestMapping("${api.prefix}/collection")
@@ -35,6 +37,7 @@ public class CollectionController {
     private S3StorageService s3StorageService;
 
     private final CollectionService collectionService;
+    private final RedisService redisService;
 
     
     @GetMapping(path = "/getall")
@@ -52,10 +55,16 @@ public class CollectionController {
         @RequestParam(defaultValue = "10", required= false) int limit
         ) throws Exception{
         PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("name").ascending());
+                String key = redisService.getKey("Collection",id, pageRequest);
+        ProductListResponse productListResponse = redisService.findAllProducts(key);
+        if(productListResponse == null){
+            productListResponse = collectionService.getOneWithProducts(id,pageRequest);
+            redisService.saveAllProducts(key, productListResponse);
+        }
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
-        .data(collectionService.getOneWithProducts(id,pageRequest))
+        .data(productListResponse)
         .build());
     }
 
@@ -90,6 +99,7 @@ public class CollectionController {
     @PutMapping(path = "/update/{id}")
     public ResponseEntity<Object> upadte(@PathVariable int id,
     @ModelAttribute CollectionDTO co, @RequestParam(required = false) MultipartFile file) throws Exception{
+        redisService.clear();
         return ResponseEntity.ok(ResponseToClient.builder()
         .message("OK")
         .status(HttpStatus.OK)
