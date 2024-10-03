@@ -1,5 +1,6 @@
 package api.anhtrangapiv2.service.order;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 
@@ -11,6 +12,7 @@ import api.anhtrangapiv2.dtos.*;
 import api.anhtrangapiv2.models.*;
 import api.anhtrangapiv2.repositories.*;
 import api.anhtrangapiv2.responses.*;
+import api.anhtrangapiv2.service.email.EmailService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +26,7 @@ public class OrderService implements IOrderService{
     private final ProductOrderRepository productOrderRepository;
     private final UserRepository userRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -34,6 +37,7 @@ public class OrderService implements IOrderService{
         User existingUser = userRepository.findById(order.getUserId()).orElseThrow(
             () -> new RuntimeException("User not found with id: " + order.getUserId())
         );
+        StringBuilder productsInfo = new StringBuilder();
         Order newOrder = Order.builder()
         .status(order.getStatus())
         .customerName(order.getCustomerName())
@@ -60,7 +64,30 @@ public class OrderService implements IOrderService{
             .order(newOrder)
             .product(existingProduct).build();
             productOrderRepository.save(newPO);
+            long cost = existingProduct.getSale_cost()>0?existingProduct.getSale_cost():existingProduct.getCost();
+            productsInfo.append(String.format("   + %s: [%s, %s] SL: %s Đơn giá: %s\n",existingProduct.getName(),
+            po.getSize(), po.getColor(),po.getQuantity(),cost));
         }
+        String customerEmail = existingUser.getEmail();
+        String subject = String.format("ANH TRANG SHOP CONFIRM: #%s", code);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy");
+        String day = newOrder.getCreateAt().format(formatter);
+
+        String emailBody = String.format("Cảm ơn quí khách đã ủng hộ AnhTrangShop!!!\n\n"
+        +"- Mã đơn hàng: %s\n"
+        +"- Ngày đặt hàng: %s\n"
+        +"- Khách hàng: %s\n"
+        +"- Số điện thoại: %s\n"
+        +"- Địa chỉ giao hàng: %s\n"
+        +"- Hình thức giao hàng: %s\n\n"
+        +"- Đơn hàng đã đặt:\n"
+        +"%s"
+        +"- Tổng giá trị đơn hàng: %s\n\n"
+        +"Mọi thắc mắc xin vui lòng liên hệ shop qua số điện thoại: 09XXXXXXXX"
+        ,code,day,newOrder.getCustomerName(),newOrder.getCustomerTel(),newOrder.getCustomerAddress(),
+        newOrder.getDelivery().getName(), productsInfo,newOrder.getTotal());
+        emailService.sendEmail(customerEmail, subject, emailBody);
+        // emailService.sendEmail(customerEmail, "hello", "test");
         return newOrder;
     }
     private String generateCode(Order order){
